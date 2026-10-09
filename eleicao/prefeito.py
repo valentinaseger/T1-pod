@@ -12,7 +12,7 @@ class Prefeito(Candidato):
         self.plano_governo = plano_governo
 
     def validar_numero(self):
-        if len(str(self.numero)) == 2:
+        if len(str(self.numero)) == 2 and str(self.numero).isdigit():
             return True
         else:
             self.erro_validacao()

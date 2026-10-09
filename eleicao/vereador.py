@@ -12,7 +12,7 @@ class Vereador(Candidato):
         self.projeto_lei = projeto_lei
 
     def validar_numero(self):
-        if len(str(self.numero)) == 5:
+        if len(str(self.numero)) == 5 and str(self.numero).isdigit():
             return True
         else:
             self.erro_validacao()

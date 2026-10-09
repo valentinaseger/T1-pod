@@ -6,6 +6,8 @@ class Candidato(Eleitor, ABC):
         super().__init__(nome, cpf, nascimento, titulo, zona, secao)
         self.numero = numero
         self.partido = partido
+        if not self.validar_numero():
+            pass # erro
 
     @abstractmethod
     def validar_numero(self):
