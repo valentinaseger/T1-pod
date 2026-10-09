@@ -209,3 +209,4 @@ class Eleicao():
         texto += f'Partidos com erro: {Partido.erros_validacao}\n'
         texto += f'Prefeitos com erro: {Prefeito.erros_validacao}\n'
         texto += f'Vereadores com erro: {Vereador.erros_validacao}\n'
+        return texto
