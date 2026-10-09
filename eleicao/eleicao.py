@@ -182,11 +182,14 @@ class Eleicao():
             else:
                 texto_final += 'Segundo Turno\n'
 
-        validos_vereador = self.filtra_validos(urna_unificada.votos_vereador, 'vereador')
-        ranking_vereador = sorted(validos_vereador.items(), key=lambda item: item[1], reverse=True)
+        ranking_vereador = []
+        for eleitor in self.eleitores:
+            if isinstance(eleitor, Vereador):
+                votos = urna_unificada.votos_vereador.get(eleitor.numero, 0)
+                ranking_vereador.append((eleitor, votos))
+        ranking_vereador.sort(key=lambda item: item[1], reverse=True)
 
-        for numero, votos in ranking_vereador[:10]:
-            vereador = self.buscar_candidato(numero, 'vereador')
+        for vereador, votos in ranking_vereador[:10]:
             texto_final += f'{vereador.nome}: {votos} votos\n'
 
         return texto_final
