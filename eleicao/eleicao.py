@@ -8,7 +8,7 @@ class Eleicao():
         self.partidos = []
         self.urnas = []
 
-    def inserir_eleitore(self, eleitor):
+    def inserir_eleitor(self, eleitor):
         self.eleitores.append(eleitor)
     def inserir_partido(self, partido):
         self.partidos.append(partido)
@@ -44,6 +44,18 @@ class Eleicao():
             urna_unificada = urna_unificada + urna
         return urna_unificada
 
+    def filtra_validos(self, votos, tipo):
+        # retorna os votos dos candidatos, sem votos nulos e brancos
+        filtrado = {}
+        for candidato, qtd in votos.items():
+            if candidato == "":
+                pass
+            elif self.buscar_candidato(candidato, tipo) == None:
+                pass
+            else:
+                filtrado[candidato] = qtd
+        return filtrado
+
     def contar_votos(self, dict_votos, tipo_candidato, tipo_voto):
         brancos = 0
         nulos = 0
@@ -66,18 +78,18 @@ class Eleicao():
     def relatorio_eleitores(self):
         total_eleitores = len(self.eleitores)
 
-        canditados_prefeito = 0
+        candidatos_prefeito = 0
         candidatos_vereador = 0
         for eleitor in self.eleitores:
             if isinstance(eleitor, Prefeito):
-                canditados_prefeito += 1
+                candidatos_prefeito += 1
             elif isinstance(eleitor, Vereador):
-                candidatos_vereador += 0
+                candidatos_vereador += 1
 
         texto_final = '========== ELEITORES ==========\n\n' \
                 f'Total de eleitores: {total_eleitores}\n' \
-                f'Total de canditados a prefeito: {canditados_prefeito}\n' \
-                f'Total de canditados a vereador: {candidatos_vereador}\n\n'
+                f'Total de candidatos a prefeito: {candidatos_prefeito}\n' \
+                f'Total de candidatos a vereador: {candidatos_vereador}\n\n'
 
         dic_zonas = {}
         for eleitor in self.eleitores:
@@ -132,8 +144,8 @@ class Eleicao():
 
             tipo_candidato = 'vereador'
             qtd_validos_vereador = self.contar_votos(urna.votos_vereador, tipo_candidato, 'valido')
-            qtd_nulos_vereador = self.contar_votos(urna.votos_vereador, tipo_candidato, 'valido')
-            qtd_brancos_vereador = self.contar_votos(urna.votos_vereador, tipo_candidato, 'valido')
+            qtd_nulos_vereador = self.contar_votos(urna.votos_vereador, tipo_candidato, 'nulo')
+            qtd_brancos_vereador = self.contar_votos(urna.votos_vereador, tipo_candidato, 'branco')
 
             texto_final += f'----- Urna {cont_urnas}\n' \
                             f'---------- Zona {urna.zona}\n' \
@@ -155,17 +167,29 @@ class Eleicao():
         texto_final = '========== Relatório de resultado geral =========='
 
         urna_unificada = self.unifica_urnas()
-        total_votos_validos_prefeito = self.contar_votos(urna_unificada, 'prefeito', 'valido')
-        votos_prefeito_ordenados = dict(sorted(urna_unificada.votos_prefeito.items(), key=lambda item: item[1], reverse=True))
-        if next(iter(votos_prefeito_ordenados.values())) > (total_votos_validos_prefeito / 2):
-            texto_final += f'Prefeito eleito: {next(iter(votos_prefeito_ordenados))}\n\n'
-        else:
-            texto_final += 'Necessita de segundo turno para prefeito\n\n'
+        validos_prefeito = self.filtra_validos(urna_unificada.votos_prefeito, 'prefeito')
+        total_votos_validos_prefeito = sum(validos_prefeito.values())
 
-        votos_vereador_ordenados = dict(sorted(urna_unificada.votos_vereador.items(), key=lambda item: item[1], reverse=True))
-        vereadores = list(votos_vereador_ordenados)[:10]
-        for vereador in vereadores:
-            texto_final += f'{vereador}: {votos_vereador_ordenados[vereador]} votos' # se tiver dois com o mesmo nome? teria que buscar pelo número? a chave em urna é o número ou nome?
+        ranking_prefeito = sorted(validos_prefeito.items(), key=lambda item: item[1], reverse=True)
+
+        if len(ranking_prefeito) == 0:
+            texto_final += 'Nenhum voto válido para prefeito\n'
+        else:
+            numero_vencedor, votos_vencedor = ranking_prefeito[0]
+            if votos_vencedor >= total_votos_validos_prefeito / 2:
+                prefeito = self.buscar_candidato(numero_vencedor, 'prefeito')
+                texto_final += f'Prefeito eleito: {prefeito.nome}\n'
+            else:
+                texto_final += 'Segundo Turno\n'
+
+        validos_vereador = self.filtra_validos(urna_unificada.votos_vereador, 'vereador')
+        ranking_vereador = sorted(validos_vereador.items(), key=lambda item: item[1], reverse=True)
+
+        for numero, votos in ranking_vereador[:10]:
+            vereador = self.buscar_candidato(numero, 'vereador')
+            texto_final += f'{vereador.nome}: {votos} votos\n'
+
+        return texto_final
         
             
     def relatorio_erros(self):

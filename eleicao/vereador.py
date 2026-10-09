@@ -6,10 +6,10 @@ class Vereador(Candidato):
     def erro_validacao(cls):
         cls.erros_validacao += 1
 
-    def __init__(self, nome, cpf, nascimento, titulo, zona, secao, numero, partido, bairro, plano_governo):
+    def __init__(self, nome, cpf, nascimento, titulo, zona, secao, numero, partido, bairro, projeto_lei):
         super().__init__(nome, cpf, nascimento, titulo, zona, secao, numero, partido)
         self.bairro = bairro
-        self.plano_governo = plano_governo
+        self.projeto_lei = projeto_lei
 
     def validar_numero(self):
         if len(str(self.numero)) == 5:

@@ -7,10 +7,9 @@ class Urna():
 
     @staticmethod
     def somar_dicionarios(dic1, dic2):
-        nova_dic = {}
-        chaves = set(dic1) | set(dic2) # cria conjunto com as chaves
-        for chave in chaves:
-            nova_dic[chave] = dic1.get(chave, 0) + dic2.get(chave, 0)
+        nova_dic = dict(dic1)  # copia mantendo a ordem
+        for chave, qtd in dic2.items():
+            nova_dic[chave] = nova_dic.get(chave, 0) + qtd
         return nova_dic
     
     def __add__(self, other):
