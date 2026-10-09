@@ -1,4 +1,5 @@
 from .candidato import Candidato
+from .excecoes import ErroCadastro
 
 class Prefeito(Candidato):
     erros_validacao = 0
@@ -27,4 +28,4 @@ class Prefeito(Candidato):
         if len(novo_cpf) == 11 and novo_cpf.isdigit():
             self._cpf_vice = novo_cpf
         else:
-            pass # tratar erro
+            raise ErroCadastro(type(self).__name__, 'cpf_vice', novo_cpf)

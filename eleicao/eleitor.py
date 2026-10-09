@@ -1,3 +1,5 @@
+from .excecoes import ErroCadastro
+
 class Eleitor:
     def __init__(self, nome, cpf, nascimento, titulo, zona, secao):
         self.nome = nome
@@ -15,7 +17,7 @@ class Eleitor:
         if len(novo_nome) <= 50:
             self._nome = novo_nome
         else:
-            pass # colocar o que acontece caso erro
+            raise ErroCadastro(type(self).__name__, 'nome', novo_nome)
 
     @property
     def cpf(self):
@@ -25,4 +27,4 @@ class Eleitor:
         if len(novo_cpf) == 11 and novo_cpf.isdigit():
             self._cpf = novo_cpf
         else:
-            pass # colocar o que acontece caso erro
+            raise ErroCadastro(type(self).__name__, 'cpf', novo_cpf)

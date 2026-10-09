@@ -1,3 +1,5 @@
+from .excecoes import ErroCadastro
+
 class Partido():
     erros_validacao = 0
     @classmethod
@@ -19,8 +21,7 @@ class Partido():
             self._nome = novo_nome
         else:
             self.erro_validacao()
-            # colocar o que acontece se erro
-
+            raise ErroCadastro(type(self).__name__, 'nome', novo_nome)
     @property
     def cnpj(self):
         return self._cnpj
@@ -30,4 +31,4 @@ class Partido():
             self._cnpj = novo_cnpj
         else:
             self.erro_validacao()
-            # colocar o que acontece se erro
+            raise ErroCadastro(type(self).__name__, 'cnpj', novo_cnpj)

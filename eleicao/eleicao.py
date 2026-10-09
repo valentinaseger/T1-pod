@@ -1,12 +1,14 @@
 from .prefeito import Prefeito
 from .vereador import Vereador
 from .urna import Urna
+from .partido import Partido
 
 class Eleicao():
     def __init__(self):
         self.eleitores = []
         self.partidos = []
         self.urnas = []
+        self.erros = []
 
     def inserir_eleitor(self, eleitor):
         self.eleitores.append(eleitor)
@@ -14,6 +16,8 @@ class Eleicao():
         self.partidos.append(partido)
     def inserir_urna(self, urna):
         self.urnas.append(urna)
+    def inserir_erro(self, erro):
+        self.erros.append(erro)
 
     def buscar_eleitor(self, titulo_eleitor):
         for eleitor in self.eleitores:
@@ -198,4 +202,10 @@ class Eleicao():
     def relatorio_erros(self):
         # informa cada mensagem gerada pelas classes de erro
         # informar os valores dos atributos que contabilizam os erros nas classes 'Partido', 'Prefeito' e 'Vereador'
-        pass
+        texto = ''
+        for erro in self.erros:
+            texto += f'{erro}\n'
+        texto += '-------------------\n'
+        texto += f'Partidos com erro: {Partido.erros_validacao}\n'
+        texto += f'Prefeitos com erro: {Prefeito.erros_validacao}\n'
+        texto += f'Vereadores com erro: {Vereador.erros_validacao}\n'
