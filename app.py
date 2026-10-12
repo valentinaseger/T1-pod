@@ -2,7 +2,7 @@ import sys
 from eleicao import Eleicao, Partido, Eleitor, Prefeito, Vereador, Urna, ErroCadastro
 
 def ler_eleitores(caminho, eleicao):
-    with open(caminho, 'r', encoding='utf-8') as arquivo:
+    with open(f'input/{caminho}', 'r', encoding='utf-8') as arquivo:
         for linha in arquivo:
             linha = linha.strip()
             if linha.startswith(('ELEITOR:', 'VEREADOR:', 'PREFEITO:')):
@@ -28,7 +28,7 @@ def ler_eleitores(caminho, eleicao):
                     eleicao.inserir_erro(erro)
 
 def ler_partidos(caminho, eleicao):
-    with open(caminho, 'r', encoding='utf-8') as arquivo:
+    with open(f'input/{caminho}', 'r', encoding='utf-8') as arquivo:
         for linha in arquivo:
             linha = linha.strip()
             if linha.startswith('PARTIDO:'):
@@ -42,7 +42,7 @@ def ler_partidos(caminho, eleicao):
                     eleicao.inserir_erro(erro)
 
 def ler_urnas(caminho, eleicao):
-    with open(caminho, 'r', encoding='utf-8') as arquivo:
+    with open(f'input/{caminho}', 'r', encoding='utf-8') as arquivo:
         for linha in arquivo:
             linha = linha.strip()
             if linha.startswith('VOTO:'):

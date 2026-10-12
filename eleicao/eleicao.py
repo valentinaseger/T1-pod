@@ -4,14 +4,21 @@ from .urna import Urna
 from .partido import Partido
 
 class Eleicao():
+    separador = ('-'*40)+'\n'
     def __init__(self):
         self.eleitores = []
         self.partidos = []
         self.urnas = []
         self.erros = []
+        self._prefeitos = {}
+        self._vereadores = {}
 
     def inserir_eleitor(self, eleitor):
         self.eleitores.append(eleitor)
+        if isinstance(eleitor, Prefeito):
+            self._prefeitos[eleitor.numero] = eleitor
+        elif isinstance(eleitor, Vereador):
+            self._vereadores[eleitor.numero] = eleitor
     def inserir_partido(self, partido):
         self.partidos.append(partido)
     def inserir_urna(self, urna):
@@ -25,11 +32,10 @@ class Eleicao():
                 return eleitor
         return None
     def buscar_candidato(self, numero, tipo):
-        for eleitor in self.eleitores:
-            if tipo == 'prefeito' and isinstance(eleitor, Prefeito) and eleitor.numero == numero:
-                return eleitor
-            if tipo == 'vereador' and isinstance(eleitor, Vereador) and eleitor.numero == numero:
-                return eleitor
+        if tipo == 'prefeito':
+            return self._prefeitos.get(numero)
+        elif tipo == 'vereador':
+            return self._vereadores.get(numero)
         return None
     def buscar_partido(self, numero):
         for partido in self.partidos:
@@ -60,7 +66,7 @@ class Eleicao():
                 filtrado[candidato] = qtd
         return filtrado
 
-    def contar_votos(self, dict_votos, tipo_candidato, tipo_voto):
+    def contar_votos(self, dict_votos, tipo_candidato):
         brancos = 0
         nulos = 0
         validos = 0
@@ -71,13 +77,11 @@ class Eleicao():
                 nulos += qtd_votos
             else:
                 validos += qtd_votos
-        if tipo_voto == 'branco':
-            return brancos
-        elif tipo_voto == 'nulo':
-            return nulos
-        else:
-            return validos
+        return validos, nulos, brancos
 
+    @staticmethod
+    def cabecalho():
+        return '-'*40
 
     def relatorio_eleitores(self):
         total_eleitores = len(self.eleitores)
@@ -90,10 +94,10 @@ class Eleicao():
             elif isinstance(eleitor, Vereador):
                 candidatos_vereador += 1
 
-        texto_final = '========== ELEITORES ==========\n\n' \
-                f'Total de eleitores: {total_eleitores}\n' \
-                f'Total de candidatos a prefeito: {candidatos_prefeito}\n' \
-                f'Total de candidatos a vereador: {candidatos_vereador}\n\n'
+        texto_final = f'{self.separador}Relatório de Eleitores \n{self.separador}' \
+                    f'Eleitores: {total_eleitores}\n' \
+                    f'Candidatos a prefeito: {candidatos_prefeito}\n' \
+                    f'Candidatos a vereador: {candidatos_vereador}\n'
 
         dic_zonas = {}
         for eleitor in self.eleitores:
@@ -106,19 +110,20 @@ class Eleicao():
                 dic_zonas[zona][secao] = 0
             dic_zonas[zona][secao] += 1
 
-        for zona, secoes in dic_zonas.items():
-            string = f'\n----- Zona {zona}\n'
-            for secao, qtd in secoes.items():
-                string += f'---------- Seção {secao}: {qtd} eleitores\n'
+        for zona in sorted(dic_zonas, key=int):
+            string = f'\nZona {zona}:\n'
+            secoes = dic_zonas[zona]
+            for secao in sorted(secoes, key=int):
+                string += f' - Seção {secao}: {secoes[secao]} eleitores\n'
             texto_final += string
 
-        return texto_final + '\n\n\n'
+        return texto_final + self.separador
     
     def relatorio_partidos(self):
         total_partidos = len(self.partidos)
 
-        texto_final = '========== PARTIDOS ==========\n\n' \
-                f'Total de partidos: {total_partidos}\n\n'
+        texto_final = f'{self.separador}Relatório de Partidos \n{self.separador}' \
+                f'Total de Partidos: {total_partidos}\n'
 
         for partido in self.partidos:
             qtd_prefeito = 0
@@ -129,46 +134,37 @@ class Eleicao():
                 if isinstance(eleitor, Vereador) and eleitor.partido == partido:
                     qtd_vereador += 1
 
-            texto_final += f'\n----- Partido {partido.nome}\n' \
-                            f'---------- Sigla: {partido.sigla}\n' \
-                            f'---------- Número de candidatos a prefeito: {qtd_prefeito}\n' \
-                            f'---------- Número de candidatos a vereador: {qtd_vereador}\n' \
+            texto_final += f'\n{partido.nome} ({partido.sigla}):\n' \
+                            f' - Prefeitos candidatos: {qtd_prefeito}\n' \
+                            f' - Vereadores candidatos: {qtd_vereador}\n' \
 
-        return texto_final + '\n\n\n'
+        return texto_final + self.separador
     
     def relatorio_urnas(self):
-        texto_final = '========== URNAS ==========\n\n'
-        cont_urnas = 0
+        texto_final = ''
         for urna in self.urnas:
-            cont_urnas += 1
             tipo_candidato = 'prefeito'
-            qtd_validos_prefeito = self.contar_votos(urna.votos_prefeito, tipo_candidato, 'valido')
-            qtd_nulos_prefeito = self.contar_votos(urna.votos_prefeito, tipo_candidato, 'nulo')
-            qtd_brancos_prefeito = self.contar_votos(urna.votos_prefeito, tipo_candidato, 'branco')
+            qtd_validos_prefeito, qtd_nulos_prefeito, qtd_brancos_prefeito = self.contar_votos(urna.votos_prefeito, tipo_candidato)
 
             tipo_candidato = 'vereador'
-            qtd_validos_vereador = self.contar_votos(urna.votos_vereador, tipo_candidato, 'valido')
-            qtd_nulos_vereador = self.contar_votos(urna.votos_vereador, tipo_candidato, 'nulo')
-            qtd_brancos_vereador = self.contar_votos(urna.votos_vereador, tipo_candidato, 'branco')
+            qtd_validos_vereador, qtd_nulos_vereador, qtd_brancos_vereador = self.contar_votos(urna.votos_vereador, tipo_candidato)
 
-            texto_final += f'----- Urna {cont_urnas}\n' \
-                            f'---------- Zona {urna.zona}\n' \
-                            f'---------- Seção {urna.secao}\n' \
-                            f'---------- Votos para prefeito: \n' \
-                            f'--------------- Válidos: {qtd_validos_prefeito}\n' \
-                            f'--------------- Nulos: {qtd_nulos_prefeito}\n' \
-                            f'--------------- Brancos: {qtd_brancos_prefeito}\n' \
-                            f'---------- Votos para vereador: \n' \
-                            f'--------------- Válidos: {qtd_validos_vereador}\n' \
-                            f'--------------- Nulos: {qtd_nulos_vereador}\n' \
-                            f'--------------- Brancos: {qtd_brancos_vereador}\n'
-            
+            texto_final += f'{self.separador}Relatório da Urna - Zona {urna.zona} - Seção {urna.secao} \n{self.separador}' \
+                            f'Votos para prefeito: \n' \
+                            f' - Válidos: {qtd_validos_prefeito}\n' \
+                            f' - Nulos: {qtd_nulos_prefeito}\n' \
+                            f' - Brancos: {qtd_brancos_prefeito}\n' \
+                            f'Votos para vereador: \n' \
+                            f' - Válidos: {qtd_validos_vereador}\n' \
+                            f' - Nulos: {qtd_nulos_vereador}\n' \
+                            f' - Brancos: {qtd_brancos_vereador}\n' \
+                            f'{self.separador}\n'
+        return texto_final
 
-        return texto_final + '\n\n\n'
     def relatorio_geral(self):
         # nome dos 10 vereadores com a maior quantidade de votos (e o número de votos)
         
-        texto_final = '========== Relatório de resultado geral =========='
+        texto_final = f'{self.separador}Relatório Geral da Eleicao \n{self.separador}'
 
         urna_unificada = self.unifica_urnas()
         validos_prefeito = self.filtra_validos(urna_unificada.votos_prefeito, 'prefeito')
@@ -182,9 +178,9 @@ class Eleicao():
             numero_vencedor, votos_vencedor = ranking_prefeito[0]
             if votos_vencedor >= total_votos_validos_prefeito / 2:
                 prefeito = self.buscar_candidato(numero_vencedor, 'prefeito')
-                texto_final += f'Prefeito eleito: {prefeito.nome}\n'
+                texto_final += f'Prefeito eleito: {prefeito.nome}\n\n'
             else:
-                texto_final += 'Segundo Turno\n'
+                texto_final += 'Prefeito: Segundo Turno\n\n'
 
         ranking_vereador = []
         for eleitor in self.eleitores:
@@ -193,20 +189,18 @@ class Eleicao():
                 ranking_vereador.append((eleitor, votos))
         ranking_vereador.sort(key=lambda item: item[1], reverse=True)
 
+        texto_final += 'Vereadores eleitos: \n'
         for vereador, votos in ranking_vereador[:10]:
-            texto_final += f'{vereador.nome}: {votos} votos\n'
+            texto_final += f' - {vereador.nome}: {votos} votos\n'
 
-        return texto_final
-        
+        return texto_final + self.separador
             
     def relatorio_erros(self):
-        # informa cada mensagem gerada pelas classes de erro
-        # informar os valores dos atributos que contabilizam os erros nas classes 'Partido', 'Prefeito' e 'Vereador'
         texto = ''
         for erro in self.erros:
             texto += f'{erro}\n'
-        texto += '-------------------\n'
-        texto += f'Partidos com erro: {Partido.erros_validacao}\n'
-        texto += f'Prefeitos com erro: {Prefeito.erros_validacao}\n'
-        texto += f'Vereadores com erro: {Vereador.erros_validacao}\n'
-        return texto
+        texto += f'\n{self.separador}Relatório de Erros \n{self.separador}' \
+                f'Partidos com nome ou CNPJ inválido: {Partido.erros_validacao}\n' \
+                f'Candidatos a prefeito com número inválido: {Prefeito.erros_validacao}\n' \
+                f'Candidatos a vereador com número inválido: {Vereador.erros_validacao}\n'
+        return texto + self.separador
