@@ -6,15 +6,3 @@ from .partido import Partido
 from .prefeito import Prefeito
 from .urna import Urna
 from .vereador import Vereador
-
-
-__all__ = [
-    "Candidato",
-    "Eleicao",
-    "Eleitor",
-    "ErroCadastro",
-    "Partido",
-    "Prefeito",
-    "Urna",
-    "Vereador",
-]
