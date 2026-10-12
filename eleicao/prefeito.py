@@ -1,30 +1,31 @@
 from .candidato import Candidato
 from .excecoes import ErroCadastro
+from .partido import Partido
 
 class Prefeito(Candidato):
     erros_validacao = 0
     @classmethod
-    def erro_validacao(cls):
+    def add_erro_validacao(cls):
         cls.erros_validacao += 1
 
-    def __init__(self, nome, cpf, nascimento, titulo, zona, secao, numero, partido, cpf_vice, plano_governo):
+    def __init__(self, nome: str, cpf: str, nascimento: str, titulo: str, zona: str, secao: str, numero: str, partido: Partido, cpf_vice: str, plano_governo: str) -> None:
         super().__init__(nome, cpf, nascimento, titulo, zona, secao, numero, partido)
         self.cpf_vice = cpf_vice
         self.plano_governo = plano_governo
 
-    def validar_numero(self):
+    def validar_numero(self) -> bool:
         if len(str(self.numero)) == 2 and str(self.numero).isdigit():
             return True
         else:
-            self.erro_validacao()
+            self.add_erro_validacao()
             return False
 
     @property
-    def cpf_vice(self):
+    def cpf_vice(self) -> str:
         return self._cpf_vice
 
     @cpf_vice.setter
-    def cpf_vice(self, novo_cpf):
+    def cpf_vice(self, novo_cpf: str) -> None:
         if len(novo_cpf) == 11 and novo_cpf.isdigit():
             self._cpf_vice = novo_cpf
         else:

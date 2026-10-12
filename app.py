@@ -1,7 +1,7 @@
 import sys
 from eleicao import Eleicao, Partido, Eleitor, Prefeito, Vereador, Urna, ErroCadastro
 
-def ler_eleitores(caminho, eleicao):
+def ler_eleitores(caminho: str, eleicao: Eleicao) -> None:
     with open(f'Input/{caminho}', 'r', encoding='utf-8') as arquivo:
         for linha in arquivo:
             linha = linha.strip()
@@ -29,7 +29,7 @@ def ler_eleitores(caminho, eleicao):
                 except Exception:
                     pass
 
-def ler_partidos(caminho, eleicao):
+def ler_partidos(caminho: str, eleicao: Eleicao) -> None:
     with open(f'Input/{caminho}', 'r', encoding='utf-8') as arquivo:
         for linha in arquivo:
             linha = linha.strip()
@@ -45,7 +45,7 @@ def ler_partidos(caminho, eleicao):
                 except Exception:
                     pass
 
-def ler_urnas(caminho, eleicao):
+def ler_urnas(caminho: str, eleicao: Eleicao) -> None:
     with open(f'Input/{caminho}', 'r', encoding='utf-8') as arquivo:
         for linha in arquivo:
             linha = linha.strip()
@@ -64,8 +64,8 @@ def ler_urnas(caminho, eleicao):
                     pass
                 
 
-def gerar_relatorios(eleicao):
-    relatorios = {
+def gerar_relatorios(eleicao: Eleicao) -> None:
+    relatorios: dict[str, str] = {
         'eleitores': eleicao.relatorio_eleitores(),
         'erros': eleicao.relatorio_erros(),
         'geral': eleicao.relatorio_geral(),
@@ -76,7 +76,7 @@ def gerar_relatorios(eleicao):
         with open(f'output/{nome}.out', 'w', encoding='utf-8') as arquivo:
             arquivo.write(texto)
 
-def main():
+def main() -> None:
     if len(sys.argv) != 4:
         print("Uso: python3 app.py Partidos.txt Eleitores.txt Urnas.txt")
         sys.exit(1)

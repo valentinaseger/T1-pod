@@ -1,5 +1,5 @@
 class ErroCadastro(Exception):
-    def __init__(self, tipo, campo, valor):
+    def __init__(self, tipo: str, campo: str, valor: str) -> None:
         self.tipo = tipo
         self.campo = campo
         self.valor = valor

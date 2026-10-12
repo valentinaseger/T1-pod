@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from .eleitor import Eleitor
 from .excecoes import ErroCadastro
+from .partido import Partido
 
 class Candidato(Eleitor, ABC):
-    def __init__(self, nome, cpf, nascimento, titulo, zona, secao, numero, partido):
+    def __init__(self, nome: str, cpf: str, nascimento: str, titulo: str, zona: str, secao: str, numero: str, partido: Partido) -> None:
         super().__init__(nome, cpf, nascimento, titulo, zona, secao)
         self.numero = numero
         self.partido = partido
@@ -11,5 +12,5 @@ class Candidato(Eleitor, ABC):
             raise ErroCadastro(type(self).__name__, 'numero', numero)
 
     @abstractmethod
-    def validar_numero(self):
+    def validar_numero(self) -> bool:
         pass
