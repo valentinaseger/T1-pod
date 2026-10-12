@@ -17,3 +17,9 @@ class Urna():
         nova_urna.votos_prefeito = self.somar_dicionarios(self.votos_prefeito, other.votos_prefeito)
         nova_urna.votos_vereador = self.somar_dicionarios(self.votos_vereador, other.votos_vereador)
         return nova_urna
+
+    def registrar_voto(self, cargo, numero):
+        if cargo == 'PREFEITO':
+            self.votos_prefeito[numero] = self.votos_prefeito.get(numero, 0) + 1
+        elif cargo == 'VEREADOR':
+            self.votos_vereador[numero] = self.votos_vereador.get(numero, 0) + 1
